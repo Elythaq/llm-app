@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FolderPlus, FolderOpen, FilePlus2, FileText, History, Cog, Download, Archive,
-  UploadCloud, Plus, Layers, Settings, ArrowLeft, ArrowRight, BookOpenText
+  UploadCloud, Plus, Layers, Settings, ArrowLeft, BookOpenText
 } from "lucide-react";
 
 export default function Sidebar({

@@ -15,25 +15,9 @@ export default function Image2D3DPage({ sidebarOpen = true }: { sidebarOpen?: bo
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-[#362a36] via-[#ffd200] to-[#ff9a00] py-10">
-      <div className="
-        w-full
-        max-w-3xl
-        min-h-[80vh]
-        bg-white/5
-        rounded-2xl
-        shadow-2xl
-        glassy-card
-        border-2
-        border-yellow-400
-        animate-borderGlow
-        flex flex-col
-        px-0
-        pt-4
-        pb-4
-        mx-2
-        my-6
-      ">
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-[#1a2980] via-[#26d0ce] to-[#67c8ff] py-10">
+    <div className="w-full max-w-3xl min-h-[80vh] bg-white/5 rounded-2xl shadow-2xl glassy-card border-2 border-cyan-300 animate-borderGlow flex flex-col p-6 mx-2 my-6">
+
         {/* Header */}
         <div className="flex items-center gap-4 mb-2">
           <span className="p-3 rounded-full bg-gradient-to-tr from-yellow-400 via-orange-400 to-pink-500 shadow-lg">

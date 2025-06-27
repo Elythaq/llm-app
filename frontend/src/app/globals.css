@@ -50,3 +50,35 @@ body {
   animation: borderFire 2s linear infinite;
 }
 
+.glassy-navbar {
+  background: rgba(22, 28, 48, 0.85);
+  backdrop-filter: blur(14px);
+  border-bottom: 1.5px solid rgba(30,184,255,0.13);
+}
+.glassy-navbar .nav-cyber-border {
+  position: relative;
+  transition: box-shadow 0.18s;
+}
+.glassy-navbar .nav-cyber-border:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 0.7rem;
+  pointer-events: none;
+  z-index: 1;
+  border: 1.5px solid transparent;
+  background: linear-gradient(90deg,rgba(30,184,255,0.18),rgba(109,40,217,0.16));
+  mask:
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  transition: border-color 0.2s;
+}
+.glassy-navbar .nav-cyber-border.selected:after {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px #0ea5e9, 0 0 18px 2px #0ea5e988;
+}

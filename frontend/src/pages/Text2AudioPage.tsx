@@ -15,25 +15,8 @@ export default function Text2AudioPage({ sidebarOpen = true }: { sidebarOpen?: b
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-[#29336e] via-[#3e4062] to-[#e57f0d] py-10">
-      <div className="
-        w-full
-        max-w-3xl
-        min-h-[80vh]
-        bg-white/5
-        rounded-2xl
-        shadow-2xl
-        glassy-card
-        border-2
-        border-orange-400
-        animate-borderGlow
-        flex flex-col
-        px-0
-        pt-4
-        pb-4
-        mx-2
-        my-6
-      ">
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-[#1a2980] via-[#26d0ce] to-[#67c8ff] py-10">
+    <div className="w-full max-w-3xl min-h-[80vh] bg-white/5 rounded-2xl shadow-2xl glassy-card border-2 border-cyan-300 animate-borderGlow flex flex-col p-6 mx-2 my-6">
         {/* Header */}
         <div className="flex items-center gap-4 mb-2">
           <span className="p-3 rounded-full bg-gradient-to-tr from-orange-400 via-yellow-500 to-pink-500 shadow-lg">

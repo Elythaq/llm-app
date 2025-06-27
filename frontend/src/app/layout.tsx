@@ -191,15 +191,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           onArchive={handleArchive}
           onSettingsClick={handleSettingsClick}
         />
-        <div
-          className="pt-20 transition-all duration-300"
-          style={{
-            marginLeft: sidebarOpen ? 340 : 0,
-            transitionProperty: "margin-left"
-          }}
-        >
-          {renderPage()}
-        </div>
+		<div
+		  className="transition-all duration-300"
+		  style={{
+			marginLeft: sidebarOpen ? 340 : 0,
+			transitionProperty: "margin-left"
+		  }}
+		>
+		  {renderPage()}
+		</div>
       </body>
     </html>
   );

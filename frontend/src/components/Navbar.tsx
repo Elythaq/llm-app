@@ -27,19 +27,19 @@ export default function Navbar({
       initial={{ y: -60, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 70, damping: 10 }}
-      className="fixed top-0 left-0 w-full bg-gradient-to-r from-gray-950 to-gray-900 shadow-lg z-50"
+      className="fixed top-0 left-0 w-full bg-gradient-to-r from-blue-900/70 via-blue-950/80 to-indigo-900/70 backdrop-blur-md border-b border-cyan-400 animate-borderGlow shadow-xl z-50"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
         <div className="flex items-center space-x-2">
           <button
-            className="mr-3 p-1 rounded hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="mr-3 p-1 rounded hover:bg-blue-800/40 focus:outline-none focus:ring-2 focus:ring-cyan-400"
             onClick={onSidebarToggle}
             title="Toggle Sidebar"
           >
-            <Menu className="w-6 h-6 text-blue-400" />
+            <Menu className="w-6 h-6 text-cyan-300" />
           </button>
-          <Bot className="w-7 h-7 text-blue-500 drop-shadow-md animate-spin-slow" />
-          <span className="text-xl font-extrabold text-white tracking-wide select-none">
+          <Bot className="w-7 h-7 text-cyan-400 drop-shadow-md animate-spin-slow" />
+          <span className="text-xl font-extrabold bg-gradient-to-r from-cyan-300 via-blue-300 to-indigo-300 text-transparent bg-clip-text tracking-wide select-none">
             Elythar LLM Studio
           </span>
         </div>
@@ -47,10 +47,10 @@ export default function Navbar({
           {useCases.map((usecase) => (
             <button
               key={usecase.key}
-              className={`flex items-center space-x-1 px-4 py-2 rounded-lg transition-all 
+              className={`flex items-center space-x-1 px-4 py-2 rounded-lg transition-all border border-transparent hover:border-cyan-300
                 ${activeUseCase === usecase.key
-                  ? "bg-blue-700/90 text-white shadow-md scale-105"
-                  : "bg-gray-800/70 text-gray-200 hover:bg-blue-900 hover:text-white"}
+                  ? "bg-cyan-700/80 text-white shadow-lg scale-105 border-cyan-400 animate-borderFire"
+                  : "bg-blue-800/50 text-cyan-100 hover:bg-cyan-800/60 hover:text-white"}
               `}
               onClick={() => onSelect && onSelect(usecase.key)}
             >
@@ -59,7 +59,7 @@ export default function Navbar({
             </button>
           ))}
         </div>
-        <Settings className="w-6 h-6 text-gray-400 hover:text-white transition cursor-pointer" />
+        <Settings className="w-6 h-6 text-cyan-300 hover:text-white transition cursor-pointer" />
       </div>
     </motion.nav>
   );

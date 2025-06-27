@@ -24,3 +24,29 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+.glassy-card {
+  background: rgba(30, 36, 56, 0.86);
+  backdrop-filter: blur(12px);
+}
+@keyframes borderGlow {
+  0% { border-color: #22d3ee; }
+  50% { border-color: #3b82f6; }
+  100% { border-color: #22d3ee; }
+}
+
+@keyframes borderFire {
+  0% { border-color: #f97316; box-shadow: 0 0 10px #f97316; }
+  25% { border-color: #fb923c; box-shadow: 0 0 15px #fb923c; }
+  50% { border-color: #facc15; box-shadow: 0 0 10px #facc15; }
+  75% { border-color: #fb923c; box-shadow: 0 0 15px #fb923c; }
+  100% { border-color: #f97316; box-shadow: 0 0 10px #f97316; }
+}
+
+.animate-borderGlow {
+  animation: borderGlow 4s linear infinite;
+}
+
+.animate-borderFire {
+  animation: borderFire 2s linear infinite;
+}
+

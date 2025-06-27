@@ -6,7 +6,7 @@ export default function ChatInput({
   onSend,
   sidebarOpen = true,
   sidebarWidth = 340,
-  isFloating = true, // NEW: allows embedded input inside a card
+  isFloating = false, // Default is inline for cards!
 }: {
   onSend: (msg: string) => void,
   sidebarOpen?: boolean,
@@ -23,7 +23,7 @@ export default function ChatInput({
     }
   }
 
-  // Common inner input UI (for both modes)
+  // Shared inner input UI
   const innerInput = (
     <div className="flex items-center gap-2 rounded-full bg-gray-800/90 px-4 py-3 w-full max-w-3xl mx-auto shadow-xl border border-gray-700" style={{ minHeight: 54 }}>
       {/* Plus Button */}
@@ -65,7 +65,6 @@ export default function ChatInput({
     </div>
   );
 
-  // FLOATING MODE (default: like you already had)
   if (isFloating) {
     return (
       <div
@@ -81,7 +80,7 @@ export default function ChatInput({
     );
   }
 
-  // EMBEDDED MODE (for inside a card, just sits in the flow)
+  // Inline/in-card mode
   return (
     <div className="w-full">{innerInput}</div>
   );

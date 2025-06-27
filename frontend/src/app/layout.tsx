@@ -4,7 +4,6 @@ import './globals.css';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import ProjectPage from '../pages/ProjectPage';
-import ProjectChatPage from '../components/ProjectChatPage';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import Text2DPage from '../pages/Text2DPage';
@@ -18,7 +17,7 @@ import CoderPage from '../pages/CoderPage';
 type UseCase =
   | "text2d"
   | "image23d"
-  | "text23d"
+  | "text2d3d"
   | "text2speech"
   | "text2audio"
   | "text2video"
@@ -73,12 +72,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     setProjects((prev) => [...prev, newProject]);
     setCurrentProjectId(newProject.id);
     setCurrentChatName("");
-    setActiveUseCase("project" as UseCase);
+    setActiveUseCase("text2d");
   }
 
   function handleProjectSelect(projectId: string) {
     setCurrentProjectId(projectId);
-    setActiveUseCase("project" as UseCase);
+    setActiveUseCase("text2d");
     setCurrentChatName(""); // clear any chat selection
   }
 
@@ -191,60 +190,105 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   // --- Render Logic
   function renderPage() {
-    if (currentProject && currentChatName) {
-      // Chat inside a project
-      const chat = currentProject.chats.find(c => c.name === currentChatName);
-      return (
-        <ProjectChatPage
-          project={currentProject}
-          chatName={currentChatName}
-          chatData={chat ? chat.messages : []}
-          onSend={msg => {
-            setProjects(prev =>
-              prev.map(p =>
-                p.id === currentProjectId
-                  ? {
-                      ...p,
-                      chats: p.chats.map(c =>
-                        c.name === currentChatName
-                          ? { ...c, messages: [...c.messages, { role: "user", content: msg }] }
-                          : c
-                      )
-                    }
-                  : p
-              )
-            );
-          }}
-          sidebarOpen={sidebarOpen}
-          sidebarWidth={340}
-        />
-      );
+    // If a chat is open (project or standalone)
+    if (currentChatName && currentChat) {
+      const onSend = (msg: string) => {
+        if (currentProject && currentChatName) {
+          setProjects(prev =>
+            prev.map(p =>
+              p.id === currentProjectId
+                ? {
+                    ...p,
+                    chats: p.chats.map(c =>
+                      c.name === currentChatName
+                        ? { ...c, messages: [...c.messages, { role: "user", content: msg }] }
+                        : c
+                    )
+                  }
+                : p
+            )
+          );
+        } else if (currentChatName) {
+          setStandaloneChats(prev =>
+            prev.map(c =>
+              c.name === currentChatName
+                ? { ...c, messages: [...c.messages, { role: "user", content: msg }] }
+                : c
+            )
+          );
+        }
+      };
+
+      switch (currentChat.type) {
+        case "text2d":
+          return (
+            <Text2DPage
+              messages={currentChat.messages}
+              onSend={onSend}
+              sidebarOpen={sidebarOpen}
+            />
+          );
+        case "text2d3d":
+          return (
+            <Text2D3DPage
+              messages={currentChat.messages}
+              onSend={onSend}
+              sidebarOpen={sidebarOpen}
+            />
+          );
+        case "image23d":
+          return (
+            <Image2D3DPage
+              messages={currentChat.messages}
+              onSend={onSend}
+              sidebarOpen={sidebarOpen}
+            />
+          );
+        case "text2audio":
+          return (
+            <Text2AudioPage
+              messages={currentChat.messages}
+              onSend={onSend}
+              sidebarOpen={sidebarOpen}
+            />
+          );
+        case "text2speech":
+          return (
+            <Text2SpeechPage
+              messages={currentChat.messages}
+              onSend={onSend}
+              sidebarOpen={sidebarOpen}
+            />
+          );
+        case "text2video":
+          return (
+            <Text2VideoPage
+              messages={currentChat.messages}
+              onSend={onSend}
+              sidebarOpen={sidebarOpen}
+            />
+          );
+        case "coder":
+          return (
+            <CoderPage
+              messages={currentChat.messages}
+              onSend={onSend}
+              sidebarOpen={sidebarOpen}
+            />
+          );
+        default:
+          return (
+            <Text2DPage
+              messages={currentChat.messages}
+              onSend={onSend}
+              sidebarOpen={sidebarOpen}
+            />
+          );
+      }
     }
-    if (!currentProjectId && currentChatName) {
-      // Standalone chat
-      const chat = standaloneChats.find(c => c.name === currentChatName);
-      // Use a generic ChatPage (or your component of choice)
-      return (
-        <ProjectChatPage // You can use another ChatPage here if you have one
-          project={undefined}
-          chatName={currentChatName}
-          chatData={chat ? chat.messages : []}
-          onSend={msg => {
-            setStandaloneChats(prev =>
-              prev.map(c =>
-                c.name === currentChatName
-                  ? { ...c, messages: [...c.messages, { role: "user", content: msg }] }
-                  : c
-              )
-            );
-          }}
-          sidebarOpen={sidebarOpen}
-          sidebarWidth={340}
-        />
-      );
-    }
+
+    // Project overview (no chat selected)
     if (currentProjectId && !currentChatName) {
-      // Project overview (no chat selected)
       return (
         <ProjectPage
           project={currentProject}
@@ -257,16 +301,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       );
     }
+
     // Otherwise, show a default page or dashboard
     switch (activeUseCase) {
-      case "text2d":        return <Text2DPage sidebarOpen={sidebarOpen} />;
-      case "image23d":      return <Image2D3DPage sidebarOpen={sidebarOpen} />;
-      case "text23d":       return <Text2D3DPage sidebarOpen={sidebarOpen} />;
-      case "text2speech":   return <Text2SpeechPage sidebarOpen={sidebarOpen} />;
-      case "text2audio":    return <Text2AudioPage sidebarOpen={sidebarOpen} />;
-      case "text2video":    return <Text2VideoPage sidebarOpen={sidebarOpen} />;
-      case "coder":         return <CoderPage sidebarOpen={sidebarOpen} />;
-      default:              return <Text2DPage sidebarOpen={sidebarOpen} />;
+      case "text2d":        return <Text2DPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
+      case "image23d":      return <Image2D3DPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
+      case "text2d3d":      return <Text2D3DPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
+      case "text2speech":   return <Text2SpeechPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
+      case "text2audio":    return <Text2AudioPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
+      case "text2video":    return <Text2VideoPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
+      case "coder":         return <CoderPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
+      default:              return <Text2DPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
     }
   }
 

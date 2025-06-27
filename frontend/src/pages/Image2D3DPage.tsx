@@ -1,23 +1,20 @@
-// pages/Image2D3DPage.tsx
-import { useState } from "react";
 import ChatArea, { ChatMessage } from "../components/ChatArea";
 import ChatInput from "../components/ChatInput";
 import Interactive3D from "../components/Interactive3D";
 import { Image as ImageIcon } from "lucide-react";
 
-export default function Image2D3DPage({ sidebarOpen = true }: { sidebarOpen?: boolean }) {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "assistant", content: "How can I help you with Image to 3D today?" }
-  ]);
-
-  function handleSend(msg: string) {
-    setMessages((prev) => [...prev, { role: "user", content: msg }]);
-  }
-
+export default function Image2D3DPage({
+  messages,
+  onSend,
+  sidebarOpen = true,
+}: {
+  messages: ChatMessage[];
+  onSend: (msg: string) => void;
+  sidebarOpen?: boolean;
+}) {
   return (
-  <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-[#1a2980] via-[#26d0ce] to-[#67c8ff] py-10">
-    <div className="w-full max-w-3xl min-h-[80vh] bg-white/5 rounded-2xl shadow-2xl glassy-card border-2 border-cyan-300 animate-borderGlow flex flex-col p-6 mx-2 my-6">
-
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-[#1a2980] via-[#26d0ce] to-[#67c8ff] py-10">
+      <div className="w-full max-w-3xl min-h-[80vh] bg-white/5 rounded-2xl shadow-2xl glassy-card border-2 border-cyan-300 animate-borderGlow flex flex-col p-6 mx-2 my-6">
         {/* Header */}
         <div className="flex items-center gap-4 mb-2">
           <span className="p-3 rounded-full bg-gradient-to-tr from-yellow-400 via-orange-400 to-pink-500 shadow-lg">
@@ -35,7 +32,11 @@ export default function Image2D3DPage({ sidebarOpen = true }: { sidebarOpen?: bo
             <ChatArea messages={messages} />
           </div>
           <div className="w-full mt-2">
-            <ChatInput onSend={handleSend} isFloating={false} />
+            <ChatInput
+              onSend={onSend}
+              isFloating={false}
+              sidebarOpen={sidebarOpen}
+            />
           </div>
         </div>
       </div>

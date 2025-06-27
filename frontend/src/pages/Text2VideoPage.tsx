@@ -1,14 +1,24 @@
-import ChatInput from '../components/ChatInput';
+import { useState } from "react";
+import ChatArea, { ChatMessage } from "../components/ChatArea";
+import ChatInput from "../components/ChatInput";
 
 export default function Text2VideoPage({ sidebarOpen = true }: { sidebarOpen?: boolean }) {
+
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { role: "assistant", content: "How can I help you with code today?" }
+  ]);
+
   function handleSend(msg: string) {
-    console.log("Text2VideoPage:", msg);
+    setMessages((prev) => [...prev, { role: "user", content: msg }]);
+    // (You can add AI assistant response here if needed)
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] pb-32">
+    <div className="flex flex-col items-center min-h-[60vh] pb-32 relative">
       <h1 className="text-3xl font-bold mb-6">Text to Video</h1>
-      <p className="text-gray-400 mb-4">Generate video clips or animations from text prompts.</p>
+      <div className="flex-1 w-full flex flex-col" style={{ minHeight: 360 }}>
+        <ChatArea messages={messages} />
+      </div>
       <ChatInput onSend={handleSend} sidebarOpen={sidebarOpen} sidebarWidth={340} />
     </div>
   );

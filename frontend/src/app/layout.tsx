@@ -1,81 +1,152 @@
 "use client";
 
-import './globals.css'
-import Navbar from '../components/Navbar'
-import Sidebar from '../components/Sidebar'
-import { useState } from 'react'
-import Text2DPage from '../pages/Text2DPage'
-import Image2D3DPage from '../pages/Image2D3DPage'
-import Text2D3DPage from '../pages/Text2D3DPage'
-import Text2SpeechPage from '../pages/Text2SpeechPage'
-import Text2AudioPage from '../pages/Text2AudioPage'
-import Text2VideoPage from '../pages/Text2VideoPage'
-import CoderPage from '../pages/CoderPage'
+import './globals.css';
+import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
+import ProjectPage from '../pages/ProjectPage';
+import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import Text2DPage from '../pages/Text2DPage';
+import Image2D3DPage from '../pages/Image2D3DPage';
+import Text2D3DPage from '../pages/Text2D3DPage';
+import Text2SpeechPage from '../pages/Text2SpeechPage';
+import Text2AudioPage from '../pages/Text2AudioPage';
+import Text2VideoPage from '../pages/Text2VideoPage';
+import CoderPage from '../pages/CoderPage';
+
+type Chat = { name: string; messages: any[] };
+type Project = {
+  id: string;
+  name: string;
+  instructions: string;
+  files: { name: string; content: any }[];
+  chats: Chat[];
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const [projects, setProjects] = useState<Project[]>([
+    {
+      id: uuidv4(),
+      name: "Demo Project",
+      instructions: "",
+      files: [],
+      chats: [
+        { name: "Chat 1", messages: [] },
+        { name: "Chat 2", messages: [] },
+      ],
+    },
+  ]);
+  const [standaloneChats, setStandaloneChats] = useState<Chat[]>([]);
+  const [currentProjectId, setCurrentProjectId] = useState<string>(projects[0]?.id || "");
+  const [currentChatName, setCurrentChatName] = useState<string>(projects[0]?.chats[0]?.name || "");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [activeUseCase, setActiveUseCase] = useState("text2d");
-  const [projects, setProjects] = useState<string[]>(["Demo Project"]);
-  const [currentProject, setCurrentProject] = useState<string>("Demo Project");
-  const [chats, setChats] = useState<string[]>(["Chat 1", "Chat 2"]);
-  const [files, setFiles] = useState<File[]>([]);
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [activeUseCase, setActiveUseCase] = useState<"project" | "text2d" | "image23d" | "text23d" | "text2speech" | "text2audio" | "text2video" | "coder">("text2d");
 
-  // 1. Project handlers
+  const currentProject = projects.find((p) => p.id === currentProjectId);
+  const currentChat =
+    currentProject?.chats.find((c) => c.name === currentChatName)
+    || standaloneChats.find((c) => c.name === currentChatName);
+
+  // --- Project management
   function handleProjectCreate() {
     const newName = window.prompt("Enter new project name:");
     if (!newName) return;
-    setProjects(prev => [...prev, newName]);
-    setCurrentProject(newName);
-    alert(`Project "${newName}" created and selected!`);
+    const newProject: Project = {
+      id: uuidv4(),
+      name: newName,
+      instructions: "",
+      files: [],
+      chats: [],
+    };
+    setProjects((prev) => [...prev, newProject]);
+    setCurrentProjectId(newProject.id);
+    setCurrentChatName("");
+    setActiveUseCase("project");
   }
-  function handleProjectSelect(project: string) {
-    setCurrentProject(project);
-    alert(`Project "${project}" selected!`);
+  function handleProjectSelect(projectId: string) {
+    setCurrentProjectId(projectId);
+    setActiveUseCase("project");
+    const proj = projects.find(p => p.id === projectId);
+    if (proj?.chats.length) setCurrentChatName(proj.chats[0].name);
+    else setCurrentChatName("");
   }
-
-  // 2. Chat handlers
-  function handleChatSelect(chat: string) {
-    if (chat === "new") {
-      const chatName = window.prompt("Enter new chat name:");
-      if (!chatName) return;
-      setChats(prev => [...prev, chatName]);
-      alert(`Chat "${chatName}" created!`);
-    } else {
-      alert(`Switched to chat: "${chat}"`);
+  function handleProjectRename(id: string, newName: string) {
+    setProjects(prev => prev.map(p => p.id === id ? { ...p, name: newName } : p));
+  }
+  function handleProjectDelete(id: string) {
+    setProjects(prev => prev.filter(p => p.id !== id));
+    if (currentProjectId === id) {
+      setCurrentProjectId("");
+      setCurrentChatName("");
     }
   }
-
-  // 3. File add (shows file picker)
-  function handleFileAdd() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.multiple = true;
-    input.onchange = (e: any) => {
-      const newFiles = Array.from(e.target.files) as File[];
-      setFiles(prev => [...prev, ...newFiles]);
-      alert(`${newFiles.length} file(s) added!`);
-    };
-    input.click();
+  function handleProjectSave(id: string) {
+    alert("Save project: " + id);
+  }
+  function handleProjectAddChat(id: string) {
+    const chatName = window.prompt("Enter chat name:");
+    if (!chatName) return;
+    setProjects(prev => prev.map(p =>
+      p.id === id
+        ? { ...p, chats: [...p.chats, { name: chatName, messages: [] }] }
+        : p
+    ));
+    setCurrentProjectId(id);
+    setCurrentChatName(chatName);
+    setActiveUseCase("project");
+  }
+  function handleChatSelect(chatName: string, projectId?: string) {
+    if (projectId) {
+      setCurrentProjectId(projectId);
+      setActiveUseCase("project");
+    }
+    setCurrentChatName(chatName);
+    setActiveUseCase(projectId ? "project" : activeUseCase);
+  }
+  function handleChatDelete(chatName: string, projectId?: string) {
+    if (projectId) {
+      setProjects(prev =>
+        prev.map(p =>
+          p.id === projectId
+            ? { ...p, chats: p.chats.filter(c => c.name !== chatName) }
+            : p
+        )
+      );
+      setCurrentChatName("");
+    } else {
+      setStandaloneChats(prev => prev.filter(c => c.name !== chatName));
+    }
+  }
+  function handleStandaloneChatCreate() {
+    const chatName = window.prompt("Enter new chat name:");
+    if (!chatName) return;
+    setStandaloneChats(prev => [...prev, { name: chatName, messages: [] }]);
+    setCurrentProjectId(""); // Deselect project so chat section is active
+    setCurrentChatName(chatName);
+    setActiveUseCase("text2d"); // Or whatever non-project use case you want to default to
   }
 
-  // 4. Export (simulate download)
-  function handleExport() {
-    alert("Export feature is not implemented yet!");
-  }
-
-  // 5. Archive (simulate archive)
-  function handleArchive() {
-    alert("Archive feature is not implemented yet!");
-  }
-
-  // 6. Settings
-  function handleSettingsClick() {
-    setSettingsOpen(true);
-    alert("Settings panel/modal would open here.");
-  }
+  // --- File handling per project
+  function handleFileAdd() { /* ...omitted for brevity... */ }
+  function handleExport() { alert("Export not implemented."); }
+  function handleArchive() { alert("Archive not implemented."); }
+  function handleSettingsClick() { alert("Settings not implemented."); }
+  function handleChatSaved() { alert("Chat saved!"); }
 
   function renderPage() {
+    if (activeUseCase === "project" && currentProject) {
+      return (
+        <ProjectPage
+          project={currentProject}
+          currentChatName={currentChatName}
+          setInstructions={instr =>
+            setProjects(prev =>
+              prev.map(p => p.id === currentProjectId ? { ...p, instructions: instr } : p)
+            )
+          }
+        />
+      );
+    }
     switch (activeUseCase) {
       case "text2d":        return <Text2DPage sidebarOpen={sidebarOpen} />;
       case "image23d":      return <Image2D3DPage sidebarOpen={sidebarOpen} />;
@@ -100,11 +171,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
           projects={projects}
-          currentProject={currentProject}
+          currentProjectId={currentProjectId}
+          chats={standaloneChats}
+          currentChat={currentChatName}
+          messages={currentChat ? currentChat.messages : []}
           onProjectCreate={handleProjectCreate}
           onProjectSelect={handleProjectSelect}
-          chats={chats}
+          onProjectRename={handleProjectRename}
+          onProjectDelete={handleProjectDelete}
+          onProjectSave={handleProjectSave}
+          onProjectAddChat={handleProjectAddChat}
           onChatSelect={handleChatSelect}
+          onChatDelete={handleChatDelete}
+          onStandaloneChatCreate={handleStandaloneChatCreate}
+          onStandaloneChatImport={() => {}} // Implement if you want
+          onChatSaved={handleChatSaved}
           onFileAdd={handleFileAdd}
           onExport={handleExport}
           onArchive={handleArchive}

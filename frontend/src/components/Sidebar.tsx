@@ -37,6 +37,7 @@ type Props = {
   onChatSelect?: (chatName: string, projectId?: string) => void;
   onChatSaved?: () => void;
   onChatDelete?: (chatName: string, projectId?: string) => void;
+  onChatRename?: (oldName: string, newName: string, projectId?: string) => void; // <-- ADD THIS
   onStandaloneChatCreate?: () => void;
   onStandaloneChatImport?: () => void;
 };
@@ -59,6 +60,7 @@ export default function Sidebar({
   onChatSelect,
   onChatSaved,
   onChatDelete,
+  onChatRename, // <-- HERE
   onStandaloneChatCreate,
   onStandaloneChatImport,
 }: Props) {
@@ -72,6 +74,13 @@ export default function Sidebar({
   const [renamingProjectId, setRenamingProjectId] = useState<string | null>(null);
   const [newProjectName, setNewProjectName] = useState("");
   const [projectChatsExpanded, setProjectChatsExpanded] = useState<{ [id: string]: boolean }>({});
+  const [menuOpenProjectId, setMenuOpenProjectId] = useState<string | null>(null);
+
+
+  // --- For Chat menus and renaming ---
+  const [chatMenu, setChatMenu] = useState<{ projectId?: string, chatName?: string } | null>(null);
+  const [renamingChat, setRenamingChat] = useState<{ projectId?: string, chatName?: string } | null>(null);
+  const [newChatName, setNewChatName] = useState("");
 
   // Toggle only the clicked project
   const toggleProjectChats = (id: string) =>
@@ -87,7 +96,7 @@ export default function Sidebar({
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -sidebarWidth, opacity: 0 }}
             transition={{ type: "spring", stiffness: 70, damping: 15 }}
-            className="fixed top-0 left-0 z-50 h-full bg-gray-950 border-r border-gray-800 shadow-2xl w-[340px] flex flex-col"
+            className="fixed top-0 left-0 z-50 h-full bg-[#111826]/90 backdrop-blur-sm border-r border-cyan-900 shadow-lg w-[340px] flex flex-col"
             style={{ width: sidebarWidth }}
           >
             {/* Sidebar header */}
@@ -200,33 +209,38 @@ export default function Sidebar({
                             </button>
                             {/* 3-dots menu */}
                             <div className="relative group">
-                              <button
-                                className="bg-gray-800 hover:bg-gray-700 rounded p-1 text-white ml-1"
-                                title="Project Options"
-                                onClick={() => setRenamingProjectId(renamingProjectId === proj.id ? null : proj.id)}
-                              >
-                                <MoreVertical className="w-4 h-4" />
-                              </button>
-                              {renamingProjectId === proj.id && (
-                                <div className="absolute top-8 right-0 bg-gray-900 rounded shadow-lg border border-gray-700 z-10">
-                                  <button
-                                    className="block w-full px-4 py-2 hover:bg-gray-800 text-left"
-                                    onClick={() => {
-                                      setNewProjectName(proj.name);
-                                      setRenamingProjectId(proj.id);
-                                    }}
-                                  >
-                                    <Edit className="inline w-4 h-4 mr-2" /> Rename
-                                  </button>
-                                  <button
-                                    className="block w-full px-4 py-2 hover:bg-red-800 text-left text-red-400"
-                                    onClick={() => onProjectDelete?.(proj.id)}
-                                  >
-                                    <Trash2 className="inline w-4 h-4 mr-2" /> Delete
-                                  </button>
-                                </div>
-                              )}
-                            </div>
+							  <button
+								className="bg-gray-800 hover:bg-gray-700 rounded p-1 text-white ml-1"
+								title="Project Options"
+								onClick={() => setMenuOpenProjectId(menuOpenProjectId === proj.id ? null : proj.id)}
+							  >
+								<MoreVertical className="w-4 h-4" />
+							  </button>
+							  {menuOpenProjectId === proj.id && (
+								<div className="absolute top-8 right-0 bg-gray-900 rounded shadow-lg border border-gray-700 z-10">
+								  <button
+									className="block w-full px-4 py-2 hover:bg-gray-800 text-left"
+									onClick={() => {
+									  setMenuOpenProjectId(null);
+									  setNewProjectName(proj.name);
+									  setRenamingProjectId(proj.id);
+									}}
+								  >
+									<Edit className="inline w-4 h-4 mr-2" /> Rename
+								  </button>
+								  <button
+									className="block w-full px-4 py-2 hover:bg-red-800 text-left text-red-400"
+									onClick={() => {
+									  setMenuOpenProjectId(null);
+									  onProjectDelete?.(proj.id);
+									}}
+								  >
+									<Trash2 className="inline w-4 h-4 mr-2" /> Delete
+								  </button>
+								</div>
+							  )}
+							</div>
+
                           </>
                         )}
                       </div>
@@ -245,12 +259,34 @@ export default function Sidebar({
                                   : "hover:bg-gray-800/80 text-gray-200"
                               }`}
                             >
-                              <button
-                                className="flex-1 flex items-center gap-2 px-2 py-1 text-left"
-                                onClick={() => onChatSelect?.(chat.name, proj.id)}
-                              >
-                                <History className="w-4 h-4" /> {chat.name}
-                              </button>
+                              {/* Chat Name or Rename Input */}
+                              {renamingChat?.projectId === proj.id && renamingChat.chatName === chat.name ? (
+                                <input
+                                  className="bg-gray-800 px-2 py-1 rounded w-24 text-sm"
+                                  value={newChatName}
+                                  onChange={e => setNewChatName(e.target.value)}
+                                  onBlur={() => {
+                                    setRenamingChat(null);
+                                    if (newChatName.trim() && newChatName !== chat.name)
+                                      onChatRename?.(chat.name, newChatName, proj.id);
+                                  }}
+                                  onKeyDown={e => {
+                                    if (e.key === "Enter") {
+                                      setRenamingChat(null);
+                                      if (newChatName.trim() && newChatName !== chat.name)
+                                        onChatRename?.(chat.name, newChatName, proj.id);
+                                    }
+                                  }}
+                                  autoFocus
+                                />
+                              ) : (
+                                <button
+                                  className="flex-1 flex items-center gap-2 px-2 py-1 text-left"
+                                  onClick={() => onChatSelect?.(chat.name, proj.id)}
+                                >
+                                  <History className="w-4 h-4" /> {chat.name}
+                                </button>
+                              )}
                               {/* Save Chat button */}
                               {currentProjectId === proj.id && currentChat === chat.name && (
                                 <button
@@ -261,6 +297,39 @@ export default function Sidebar({
                                   <SaveIcon className="w-4 h-4" />
                                 </button>
                               )}
+                              {/* Three dots menu for chats */}
+                              <div className="relative">
+                                <button
+                                  className="bg-gray-800 hover:bg-gray-700 rounded p-1 text-white ml-1"
+                                  onClick={() => setChatMenu(chatMenu && chatMenu.projectId === proj.id && chatMenu.chatName === chat.name ? null : { projectId: proj.id, chatName: chat.name })}
+                                  title="Chat Options"
+                                >
+                                  <MoreVertical className="w-4 h-4" />
+                                </button>
+                                {chatMenu && chatMenu.projectId === proj.id && chatMenu.chatName === chat.name && (
+                                  <div className="absolute top-8 right-0 bg-gray-900 rounded shadow-lg border border-gray-700 z-10">
+                                    <button
+                                      className="block w-full px-4 py-2 hover:bg-gray-800 text-left"
+                                      onClick={() => {
+                                        setRenamingChat({ projectId: proj.id, chatName: chat.name });
+                                        setNewChatName(chat.name);
+                                        setChatMenu(null);
+                                      }}
+                                    >
+                                      <Edit className="inline w-4 h-4 mr-2" /> Rename
+                                    </button>
+                                    <button
+                                      className="block w-full px-4 py-2 hover:bg-red-800 text-left text-red-400"
+                                      onClick={() => {
+                                        onChatDelete?.(chat.name, proj.id);
+                                        setChatMenu(null);
+                                      }}
+                                    >
+                                      <Trash2 className="inline w-4 h-4 mr-2" /> Delete
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -299,12 +368,34 @@ export default function Sidebar({
                       className={`flex items-center group rounded 
                         ${!currentProjectId && currentChat === chat.name ? "bg-blue-900/70 font-bold text-blue-300" : "hover:bg-gray-800/90 text-gray-200"}`}
                     >
-                      <button
-                        onClick={() => onChatSelect?.(chat.name)}
-                        className="flex-1 flex items-center gap-2 px-2 py-2 text-left"
-                      >
-                        <History className="w-4 h-4" /> {chat.name}
-                      </button>
+                      {/* Chat Name or Rename Input */}
+                      {renamingChat?.chatName === chat.name && !renamingChat.projectId ? (
+                        <input
+                          className="bg-gray-800 px-2 py-1 rounded w-24 text-sm"
+                          value={newChatName}
+                          onChange={e => setNewChatName(e.target.value)}
+                          onBlur={() => {
+                            setRenamingChat(null);
+                            if (newChatName.trim() && newChatName !== chat.name)
+                              onChatRename?.(chat.name, newChatName);
+                          }}
+                          onKeyDown={e => {
+                            if (e.key === "Enter") {
+                              setRenamingChat(null);
+                              if (newChatName.trim() && newChatName !== chat.name)
+                                onChatRename?.(chat.name, newChatName);
+                            }
+                          }}
+                          autoFocus
+                        />
+                      ) : (
+                        <button
+                          onClick={() => onChatSelect?.(chat.name)}
+                          className="flex-1 flex items-center gap-2 px-2 py-2 text-left"
+                        >
+                          <History className="w-4 h-4" /> {chat.name}
+                        </button>
+                      )}
                       {/* Only show save on the selected standalone chat */}
                       {!currentProjectId && currentChat === chat.name && (
                         <button
@@ -316,6 +407,39 @@ export default function Sidebar({
                           <SaveIcon className="w-4 h-4" />
                         </button>
                       )}
+                      {/* Three dots menu for standalone chats */}
+                      <div className="relative">
+                        <button
+                          className="bg-gray-800 hover:bg-gray-700 rounded p-1 text-white ml-1"
+                          onClick={() => setChatMenu(chatMenu && !chatMenu.projectId && chatMenu.chatName === chat.name ? null : { chatName: chat.name })}
+                          title="Chat Options"
+                        >
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                        {chatMenu && !chatMenu.projectId && chatMenu.chatName === chat.name && (
+                          <div className="absolute top-8 right-0 bg-gray-900 rounded shadow-lg border border-gray-700 z-10">
+                            <button
+                              className="block w-full px-4 py-2 hover:bg-gray-800 text-left"
+                              onClick={() => {
+                                setRenamingChat({ chatName: chat.name });
+                                setNewChatName(chat.name);
+                                setChatMenu(null);
+                              }}
+                            >
+                              <Edit className="inline w-4 h-4 mr-2" /> Rename
+                            </button>
+                            <button
+                              className="block w-full px-4 py-2 hover:bg-red-800 text-left text-red-400"
+                              onClick={() => {
+                                onChatDelete?.(chat.name);
+                                setChatMenu(null);
+                              }}
+                            >
+                              <Trash2 className="inline w-4 h-4 mr-2" /> Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

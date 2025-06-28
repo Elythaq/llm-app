@@ -81,6 +81,39 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     setCurrentChatName(""); // clear any chat selection
   }
 
+	function handleChatRename(oldName: string, newName: string, projectId?: string) {
+	  if (projectId) {
+		// Project chat rename
+		setProjects(prev =>
+		  prev.map(p =>
+			p.id === projectId
+			  ? {
+				  ...p,
+				  chats: p.chats.map(c =>
+					c.name === oldName ? { ...c, name: newName } : c
+				  ),
+				}
+			  : p
+		  )
+		);
+		// If renaming the current chat, update selected chat name
+		if (currentChatName === oldName && currentProjectId === projectId) {
+		  setCurrentChatName(newName);
+		}
+	  } else {
+		// Standalone chat rename
+		setStandaloneChats(prev =>
+		  prev.map(c =>
+			c.name === oldName ? { ...c, name: newName } : c
+		  )
+		);
+		// If renaming the current chat, update selected chat name
+		if (currentChatName === oldName && !currentProjectId) {
+		  setCurrentChatName(newName);
+		}
+	  }
+	}
+
   function handleProjectRename(id: string, newName: string) {
     setProjects(prev => prev.map(p => p.id === id ? { ...p, name: newName } : p));
   }
@@ -189,142 +222,152 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   }
 
   // --- Render Logic
-  function renderPage() {
-    // If a chat is open (project or standalone)
-    if (currentChatName && currentChat) {
-      const onSend = (msg: string) => {
-        if (currentProject && currentChatName) {
-          setProjects(prev =>
-            prev.map(p =>
-              p.id === currentProjectId
-                ? {
-                    ...p,
-                    chats: p.chats.map(c =>
-                      c.name === currentChatName
-                        ? { ...c, messages: [...c.messages, { role: "user", content: msg }] }
-                        : c
-                    )
-                  }
-                : p
-            )
-          );
-        } else if (currentChatName) {
-          setStandaloneChats(prev =>
-            prev.map(c =>
-              c.name === currentChatName
-                ? { ...c, messages: [...c.messages, { role: "user", content: msg }] }
-                : c
-            )
-          );
-        }
-      };
+	function renderPage() {
+	  // If a chat is open (project or standalone)
+	  if (currentChatName && currentChat) {
+		const onSend = (msg: string) => {
+		  if (currentProject && currentChatName && currentProject.chats.some(c => c.name === currentChatName)) {
+			// Project chat
+			setProjects(prev =>
+			  prev.map(p =>
+				p.id === currentProjectId
+				  ? {
+					  ...p,
+					  chats: p.chats.map(c =>
+						c.name === currentChatName
+						  ? { ...c, messages: [...c.messages, { role: "user", content: msg }] }
+						  : c
+					  )
+					}
+				  : p
+			  )
+			);
+		  } else if (currentChatName) {
+			// Standalone chat
+			setStandaloneChats(prev =>
+			  prev.map(c =>
+				c.name === currentChatName
+				  ? { ...c, messages: [...c.messages, { role: "user", content: msg }] }
+				  : c
+			  )
+			);
+		  }
+		};
 
-      switch (currentChat.type) {
-        case "text2d":
-          return (
-            <Text2DPage
-              messages={currentChat.messages}
-              onSend={onSend}
-              sidebarOpen={sidebarOpen}
-            />
-          );
-        case "text2d3d":
-          return (
-            <Text2D3DPage
-              messages={currentChat.messages}
-              onSend={onSend}
-              sidebarOpen={sidebarOpen}
-            />
-          );
-        case "image23d":
-          return (
-            <Image2D3DPage
-              messages={currentChat.messages}
-              onSend={onSend}
-              sidebarOpen={sidebarOpen}
-            />
-          );
-        case "text2audio":
-          return (
-            <Text2AudioPage
-              messages={currentChat.messages}
-              onSend={onSend}
-              sidebarOpen={sidebarOpen}
-            />
-          );
-        case "text2speech":
-          return (
-            <Text2SpeechPage
-              messages={currentChat.messages}
-              onSend={onSend}
-              sidebarOpen={sidebarOpen}
-            />
-          );
-        case "text2video":
-          return (
-            <Text2VideoPage
-              messages={currentChat.messages}
-              onSend={onSend}
-              sidebarOpen={sidebarOpen}
-            />
-          );
-        case "coder":
-          return (
-            <CoderPage
-              messages={currentChat.messages}
-              onSend={onSend}
-              sidebarOpen={sidebarOpen}
-            />
-          );
-        default:
-          return (
-            <Text2DPage
-              messages={currentChat.messages}
-              onSend={onSend}
-              sidebarOpen={sidebarOpen}
-            />
-          );
-      }
-    }
+		switch (currentChat.type) {
+		  case "text2d":
+			return (
+			  <Text2DPage
+				messages={currentChat.messages}
+				onSend={onSend}
+				sidebarOpen={sidebarOpen}
+			  />
+			);
+		  case "text2d3d":
+			return (
+			  <Text2D3DPage
+				messages={currentChat.messages}
+				onSend={onSend}
+				sidebarOpen={sidebarOpen}
+			  />
+			);
+		  case "image23d":
+			return (
+			  <Image2D3DPage
+				messages={currentChat.messages}
+				onSend={onSend}
+				sidebarOpen={sidebarOpen}
+			  />
+			);
+		  case "text2audio":
+			return (
+			  <Text2AudioPage
+				messages={currentChat.messages}
+				onSend={onSend}
+				sidebarOpen={sidebarOpen}
+			  />
+			);
+		  case "text2speech":
+			return (
+			  <Text2SpeechPage
+				messages={currentChat.messages}
+				onSend={onSend}
+				sidebarOpen={sidebarOpen}
+			  />
+			);
+		  case "text2video":
+			return (
+			  <Text2VideoPage
+				messages={currentChat.messages}
+				onSend={onSend}
+				sidebarOpen={sidebarOpen}
+			  />
+			);
+		  case "coder":
+			return (
+			  <CoderPage
+				messages={currentChat.messages}
+				onSend={onSend}
+				sidebarOpen={sidebarOpen}
+			  />
+			);
+		  default:
+			return (
+			  <Text2DPage
+				messages={currentChat.messages}
+				onSend={onSend}
+				sidebarOpen={sidebarOpen}
+			  />
+			);
+		}
+	  }
 
-    // Project overview (no chat selected)
-    if (currentProjectId && !currentChatName) {
-      return (
-        <ProjectPage
-          project={currentProject}
-          currentChatName={currentChatName}
-          setInstructions={instr =>
-            setProjects(prev =>
-              prev.map(p => p.id === currentProjectId ? { ...p, instructions: instr } : p)
-            )
-          }
-        />
-      );
-    }
+	  // Project overview (no chat selected)
+	  if (currentProjectId && !currentChatName) {
+		return (
+		  <ProjectPage
+			project={currentProject}
+			currentChatName={currentChatName}
+			setInstructions={instr =>
+			  setProjects(prev =>
+				prev.map(p => p.id === currentProjectId ? { ...p, instructions: instr } : p)
+			  )
+			}
+		  />
+		);
+	  }
 
-    // Otherwise, show a default page or dashboard
-    switch (activeUseCase) {
-      case "text2d":        return <Text2DPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
-      case "image23d":      return <Image2D3DPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
-      case "text2d3d":      return <Text2D3DPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
-      case "text2speech":   return <Text2SpeechPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
-      case "text2audio":    return <Text2AudioPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
-      case "text2video":    return <Text2VideoPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
-      case "coder":         return <CoderPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
-      default:              return <Text2DPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
-    }
-  }
+	  // Otherwise, show a default page or dashboard
+	  switch (activeUseCase) {
+		case "text2d":
+		  return <Text2DPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
+		case "image23d":
+		  return <Image2D3DPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
+		case "text2d3d":
+		  return <Text2D3DPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
+		case "text2speech":
+		  return <Text2SpeechPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
+		case "text2audio":
+		  return <Text2AudioPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
+		case "text2video":
+		  return <Text2VideoPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
+		case "coder":
+		  return <CoderPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
+		default:
+		  return <Text2DPage sidebarOpen={sidebarOpen} messages={[]} onSend={() => {}} />;
+	  }
+	}
 
   return (
     <html lang="en">
       <body className="bg-gray-900 text-white">
         {/* Show navbar ONLY when a chat is open */}
-        {currentChatName && (
-          <Navbar
-            onSidebarToggle={() => setSidebarOpen((prev) => !prev)}
-            onSelect={handleNavbarTypeChange}
-            activeUseCase={activeUseCase}
-          />
+		<Navbar
+		  onSidebarToggle={() => setSidebarOpen((prev) => !prev)}
+		  onSelect={handleNavbarTypeChange}
+		  activeUseCase={activeUseCase}
+		  inChatContext={!!currentChatName}
+		/>
         )}
         <Sidebar
           isOpen={sidebarOpen}
@@ -349,6 +392,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           onExport={handleExport}
           onArchive={handleArchive}
           onSettingsClick={handleSettingsClick}
+		  onChatRename={handleChatRename}
         />
         <div
           className="transition-all duration-300"

@@ -13,7 +13,7 @@ export default function CoderPage({
   sidebarOpen?: boolean;
 }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-[#1a2980] via-[#26d0ce] to-[#67c8ff] py-10">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-[#15181e] via-[#223041] to-[#175570] py-10">
       <div className="w-full max-w-3xl min-h-[80vh] bg-white/5 rounded-2xl shadow-2xl glassy-card border-2 border-cyan-300 animate-borderGlow flex flex-col p-6 mx-2 my-6">
         {/* Header */}
         <div className="flex items-center gap-4 mb-2">

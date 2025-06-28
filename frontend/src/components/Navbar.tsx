@@ -20,6 +20,7 @@ export default function Navbar({
   activeUseCase = "text2d",
   sidebarOpen = false, // default: collapsed
   sidebarWidth = 340,
+  inChatContext = false,
 }: {
   onSelect?: (usecase: string) => void,
   onSidebarToggle?: () => void,

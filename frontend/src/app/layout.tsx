@@ -198,28 +198,41 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   function handleSettingsClick() { alert("Settings not implemented."); }
   function handleChatSaved() { alert("Chat saved!"); }
 
-  // --- Navbar: Change type of the current chat
-  function handleNavbarTypeChange(newType: UseCase) {
-    setActiveUseCase(newType);
-    if (currentProject && currentChatName) {
-      setProjects(prev =>
-        prev.map(p =>
-          p.id === currentProjectId
-            ? {
-                ...p,
-                chats: p.chats.map(c =>
-                  c.name === currentChatName ? { ...c, type: newType } : c
-                ),
-              }
-            : p
-        )
-      );
-    } else if (currentChatName) {
-      setStandaloneChats(prev =>
-        prev.map(c => c.name === currentChatName ? { ...c, type: newType } : c)
-      );
-    }
-  }
+	// --- Navbar: Change type of the current chat
+	function handleNavbarTypeChange(newType: UseCase) {
+	  setActiveUseCase(newType);
+
+	  // Check if we're in a project chat (current chat name is in current project's chats)
+	  if (
+		currentProject &&
+		currentChatName &&
+		currentProject.chats.some(c => c.name === currentChatName)
+	  ) {
+		setProjects(prev =>
+		  prev.map(p =>
+			p.id === currentProjectId
+			  ? {
+				  ...p,
+				  chats: p.chats.map(c =>
+					c.name === currentChatName ? { ...c, type: newType } : c
+				  ),
+				}
+			  : p
+		  )
+		);
+	  }
+	  // Otherwise, if we're in a standalone chat (chat exists in standaloneChats)
+	  else if (
+		currentChatName &&
+		standaloneChats.some(c => c.name === currentChatName)
+	  ) {
+		setStandaloneChats(prev =>
+		  prev.map(c =>
+			c.name === currentChatName ? { ...c, type: newType } : c
+		  )
+		);
+	  }
+	}
 
   // --- Render Logic
 	function renderPage() {

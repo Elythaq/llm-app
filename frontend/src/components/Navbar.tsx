@@ -57,7 +57,13 @@ export default function Navbar({
           >
             <Menu className="w-5 h-5 text-cyan-300" />
           </button>
-          <Bot className="w-6 h-6 text-cyan-400 drop-shadow" />
+          <img
+			  src="/logo.svg"
+			  alt="Your Logo"
+			  className="w-8 h-8 object-contain drop-shadow"
+			  style={{ borderRadius: "8px" }} // optional for rounded look
+			/>
+
           <span className="font-semibold text-base md:text-lg tracking-tight bg-gradient-to-r from-sky-300 to-cyan-400 text-transparent bg-clip-text select-none">
             Elythar LLM Studio
           </span>

@@ -3,15 +3,17 @@ import ChatInput from "../components/ChatInput";
 import Interactive3D from "../components/Interactive3D";
 import { LayoutTemplate } from "lucide-react";
 
+type Text2DPageProps = {
+  messages: ChatMessage[];
+  onSend: (msg: string) => void;
+  sidebarOpen?: boolean;
+};
+
 export default function Text2DPage({
   messages,
   onSend,
   sidebarOpen = true,
-}: {
-  messages: ChatMessage[];
-  onSend: (msg: string) => void;
-  sidebarOpen?: boolean;
-}) {
+}: Text2DPageProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-[#131c2b] via-[#2a2d3a] to-[#0f2a40] py-10">
       <div className="w-full max-w-3xl min-h-[80vh] bg-white/5 rounded-2xl shadow-2xl glassy-card border-2 border-cyan-300 animate-borderGlow flex flex-col p-6 mx-2 my-6">
@@ -25,7 +27,6 @@ export default function Text2DPage({
           </h1>
         </div>
         <Interactive3D color="#3ec9e7" />
-
         {/* Chat + Input in the card! */}
         <div className="flex-1 flex flex-col justify-end w-full">
           <div className="flex-1 overflow-y-auto">

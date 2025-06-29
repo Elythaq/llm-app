@@ -91,14 +91,16 @@ export default function Sidebar({
     <>
       <AnimatePresence>
         {isOpen && (
-          <motion.aside
-            initial={{ x: -sidebarWidth, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -sidebarWidth, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 70, damping: 15 }}
-            className="fixed top-0 left-0 z-50 h-full bg-[#111826]/90 backdrop-blur-sm border-r border-cyan-900 shadow-lg w-[340px] flex flex-col"
-            style={{ width: sidebarWidth }}
-          >
+			<motion.aside
+			  initial={{ x: -sidebarWidth, opacity: 0 }}
+			  animate={{ x: 0, opacity: 1 }}
+			  exit={{ x: -sidebarWidth, opacity: 0 }}
+			  transition={{ type: "spring", stiffness: 70, damping: 15 }}
+			  className="fixed top-0 left-0 z-50 h-full w-[340px] flex flex-col border-r border-cyan-900
+				bg-[rgba(17,24,38,0.50)] backdrop-blur-lg"
+			  style={{ width: sidebarWidth, boxShadow: "none" }}
+			>
+
             {/* Sidebar header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-gradient-to-r from-gray-950 to-gray-900">
               <span className="text-lg font-bold flex items-center gap-2">
@@ -217,7 +219,7 @@ export default function Sidebar({
 								<MoreVertical className="w-4 h-4" />
 							  </button>
 							  {menuOpenProjectId === proj.id && (
-								<div className="absolute top-8 right-0 bg-gray-900 rounded shadow-lg border border-gray-700 z-10">
+								<div className="absolute top-8 right-0 bg-gray-900 rounded border border-gray-700 z-10">
 								  <button
 									className="block w-full px-4 py-2 hover:bg-gray-800 text-left"
 									onClick={() => {
@@ -417,7 +419,7 @@ export default function Sidebar({
                           <MoreVertical className="w-4 h-4" />
                         </button>
                         {chatMenu && !chatMenu.projectId && chatMenu.chatName === chat.name && (
-                          <div className="absolute top-8 right-0 bg-gray-900 rounded shadow-lg border border-gray-700 z-10">
+                          <div className="absolute top-8 right-0 bg-gray-900 rounded border border-gray-700 z-10">
                             <button
                               className="block w-full px-4 py-2 hover:bg-gray-800 text-left"
                               onClick={() => {
@@ -450,8 +452,8 @@ export default function Sidebar({
       </AnimatePresence>
       {/* Save Chat Modal */}
       {showSaveChat && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center">
-          <div className="bg-gray-900 rounded-xl shadow-lg p-6 w-full max-w-md border border-gray-700">
+        <div className="fixed inset-0 z-50 bg-black/10 flex items-center justify-center">
+          <div className="bg-gray-900 rounded-xl p-6 w-full max-w-md border border-gray-700">
             <div className="flex justify-between items-center mb-3">
               <span className="font-bold text-lg">Save Chat</span>
               <button
@@ -473,8 +475,8 @@ export default function Sidebar({
       )}
       {/* Save Project Modal */}
       {showSaveProject && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center">
-          <div className="bg-gray-900 rounded-xl shadow-lg p-6 w-full max-w-md border border-gray-700">
+        <div className="fixed inset-0 z-50 bg-black/10 flex items-center justify-center">
+          <div className="bg-gray-900 rounded-xl p-6 w-full max-w-md border border-gray-700">
             <div className="flex justify-between items-center mb-3">
               <span className="font-bold text-lg">Save Project</span>
               <button
@@ -494,8 +496,8 @@ export default function Sidebar({
       )}
       {/* Import Chat Modal */}
       {showImportChat && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center">
-          <div className="bg-gray-900 rounded-xl shadow-lg p-6 w-full max-w-md border border-gray-700">
+        <div className="fixed inset-0 z-50 bg-black/10 flex items-center justify-center">
+          <div className="bg-gray-900 rounded-xl p-6 w-full max-w-md border border-gray-700">
             <div className="flex justify-between items-center mb-3">
               <span className="font-bold text-lg">Import Chat</span>
               <button
@@ -512,8 +514,8 @@ export default function Sidebar({
       )}
       {/* Import Project Modal */}
       {showImportProject && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center">
-          <div className="bg-gray-900 rounded-xl shadow-lg p-6 w-full max-w-md border border-gray-700">
+        <div className="fixed inset-0 z-50 bg-black/10 flex items-center justify-center">
+          <div className="bg-gray-900 rounded-xl p-6 w-full max-w-md border border-gray-700">
             <div className="flex justify-between items-center mb-3">
               <span className="font-bold text-lg">Import Project</span>
               <button

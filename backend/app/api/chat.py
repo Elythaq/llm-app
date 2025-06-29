@@ -5,7 +5,7 @@ import json
 
 router = APIRouter()
 
-BASE_PATH = "D:/llm_chats"  # You can update this path or make it configurable later
+BASE_PATH = "D:/llm_chats"  # Update this as needed
 
 class SaveChatBody(BaseModel):
     project_name: str = ""
@@ -24,6 +24,7 @@ async def save_chat(body: SaveChatBody):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(body.messages, f, indent=2)
     return {"success": True}
+
 from fastapi import UploadFile, File, Form
 from fastapi.responses import JSONResponse
 
@@ -34,18 +35,13 @@ async def import_chat(
     project_id: str = Form(""),
     chat_name: str = Form("")
 ):
-    # Determine folder
     if project_name and project_id:
         folder = os.path.join(BASE_PATH, f"{project_name}_{project_id}")
     else:
         folder = os.path.join(BASE_PATH, "global_chats")
     os.makedirs(folder, exist_ok=True)
-    
-    # Use provided chat_name or filename without extension
     base_name = chat_name or os.path.splitext(file.filename)[0]
     path = os.path.join(folder, f"{base_name}.json")
-
-    # Save uploaded file
     contents = await file.read()
     try:
         data = json.loads(contents.decode("utf-8"))

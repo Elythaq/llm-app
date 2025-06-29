@@ -1,9 +1,9 @@
 import ChatArea, { ChatMessage } from "../components/ChatArea";
 import ChatInput from "../components/ChatInput";
 import Interactive3D from "../components/Interactive3D";
-import { Mic } from "lucide-react";
+import { MessageCircle } from "lucide-react"; // Optionally use a different icon
 
-export default function Text2SpeechPage({
+export default function Text2TextPage({
   messages,
   onSend,
   sidebarOpen = true,
@@ -18,10 +18,10 @@ export default function Text2SpeechPage({
         {/* Header */}
         <div className="flex items-center gap-4 mb-2">
           <span className="p-3 rounded-full bg-gradient-to-tr from-teal-400 via-cyan-400 to-green-400 shadow-lg">
-            <Mic className="text-white w-8 h-8" />
+            <MessageCircle className="text-white w-8 h-8" />
           </span>
           <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-teal-300 via-cyan-400 to-green-400 text-transparent bg-clip-text">
-            Text to Speech
+            Text to Text
           </h1>
         </div>
         <Interactive3D color="#27aeb1" />

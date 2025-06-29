@@ -1,10 +1,14 @@
-# D:\development_tools\llm-app\backend\app\models\text_generator.py
-
+# models/text_generator.py
 from transformers import pipeline
 
-# Loads once at startup, so generation is fast on each call.
-generator = pipeline("text-generation", model="gpt2", device=0)
+generator = pipeline(
+    "text-generation",
+    model="Qwen/Qwen2-1.5B",
+    torch_dtype="auto",
+    device=0,
+    max_new_tokens=512
+)
 
 def generate_text(prompt: str) -> str:
-    results = generator(prompt, max_length=200, num_return_sequences=1)
-    return results[0]["generated_text"]
+    result = generator(prompt, max_length=1024, num_return_sequences=1)
+    return result[0]["generated_text"]

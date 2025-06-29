@@ -9,16 +9,17 @@ import { v4 as uuidv4 } from 'uuid';
 import Text2DPage from '../pages/Text2DPage';
 import Image2D3DPage from '../pages/Image2D3DPage';
 import Text2D3DPage from '../pages/Text2D3DPage';
-import Text2SpeechPage from '../pages/Text2SpeechPage';
+import Text2TextPage from '../pages/Text2TextPage';
 import Text2AudioPage from '../pages/Text2AudioPage';
 import Text2VideoPage from '../pages/Text2VideoPage';
 import CoderPage from '../pages/CoderPage';
+import { sendChatMessage, ChatType } from "../utils/chatApi";
 
 type UseCase =
   | "text2d"
   | "image23d"
   | "text2d3d"
-  | "text2speech"
+  | "text2text"
   | "text2audio"
   | "text2video"
   | "coder";
@@ -80,7 +81,32 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     setActiveUseCase("text2d");
     setCurrentChatName(""); // clear any chat selection
   }
-
+	function handleAddMessage(chatName: string, message: any, role: "user" | "assistant", projectId?: string) {
+	  if (projectId) {
+		setProjects(prev =>
+		  prev.map(p =>
+			p.id === projectId
+			  ? {
+				  ...p,
+				  chats: p.chats.map(c =>
+					c.name === chatName
+					  ? { ...c, messages: [...c.messages, { role, content: message }] }
+					  : c
+				  )
+				}
+			  : p
+		  )
+		);
+	  } else {
+		setStandaloneChats(prev =>
+		  prev.map(c =>
+			c.name === chatName
+			  ? { ...c, messages: [...c.messages, { role, content: message }] }
+			  : c
+		  )
+		);
+	  }
+	}
 	function handleChatRename(oldName: string, newName: string, projectId?: string) {
 	  if (projectId) {
 		// Project chat rename
@@ -234,37 +260,32 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 	  }
 	}
 
-  // --- Render Logic
+	// --- Render Logic
 	function renderPage() {
 	  // If a chat is open (project or standalone)
 	  if (currentChatName && currentChat) {
-		const onSend = (msg: string) => {
-		  if (currentProject && currentChatName && currentProject.chats.some(c => c.name === currentChatName)) {
-			// Project chat
-			setProjects(prev =>
-			  prev.map(p =>
-				p.id === currentProjectId
-				  ? {
-					  ...p,
-					  chats: p.chats.map(c =>
-						c.name === currentChatName
-						  ? { ...c, messages: [...c.messages, { role: "user", content: msg }] }
-						  : c
-					  )
-					}
-				  : p
-			  )
-			);
-		  } else if (currentChatName) {
-			// Standalone chat
-			setStandaloneChats(prev =>
-			  prev.map(c =>
-				c.name === currentChatName
-				  ? { ...c, messages: [...c.messages, { role: "user", content: msg }] }
-				  : c
-			  )
-			);
-		  }
+		// Unified async handler for all chat types
+		const onSend = async (msg: string) => {
+		  // Add user message first
+		  handleAddMessage(
+			currentChat.name,
+			msg,
+			"user",
+			currentProject ? currentProjectId : undefined
+		  );
+
+		  // Use chat type to hit correct endpoint
+		  const aiMsg = await sendChatMessage(
+			currentChat.type as ChatType,
+			msg
+		  );
+
+		  handleAddMessage(
+			currentChat.name,
+			aiMsg.content,
+			"assistant",
+			currentProject ? currentProjectId : undefined
+		  );
 		};
 
 		switch (currentChat.type) {
@@ -343,7 +364,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			currentChatName={currentChatName}
 			setInstructions={instr =>
 			  setProjects(prev =>
-				prev.map(p => p.id === currentProjectId ? { ...p, instructions: instr } : p)
+				prev.map(p =>
+				  p.id === currentProjectId ? { ...p, instructions: instr } : p
+				)
 			  )
 			}
 		  />

@@ -31,7 +31,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white p-4">
+    <main className="min-h-screen flex flex-col items-center justify-center bg-white text-black p-4">
       <div className="w-full max-w-lg space-y-4">
         <h1 className="text-3xl font-bold text-center">Local LLM Prompt</h1>
         <textarea

@@ -7,8 +7,8 @@ import {
 const useCases = [
   { key: "text2d", label: "Text to 2D", icon: <Image className="w-4 h-4" /> },
   { key: "image23d", label: "Image to 3D", icon: <Package className="w-4 h-4" /> },
-  { key: "text23d", label: "Text to 3D", icon: <Package className="w-4 h-4" /> },
-  { key: "text2speech", label: "Text to Speech", icon: <FileAudio2 className="w-4 h-4" /> },
+  { key: "text2d3d", label: "Text to 3D", icon: <Package className="w-4 h-4" /> },
+  { key: "text2text", label: "Text Generator", icon: <FileAudio2 className="w-4 h-4" /> },
   { key: "text2audio", label: "Text to Audio", icon: <FileAudio2 className="w-4 h-4" /> },
   { key: "text2video", label: "Text to Video", icon: <Video className="w-4 h-4" /> },
   { key: "coder", label: "Coder", icon: <FileText className="w-4 h-4" /> }
